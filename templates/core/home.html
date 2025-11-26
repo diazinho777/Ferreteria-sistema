@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    
+    <h2 class="text-3xl font-extrabold text-gray-800 mb-8 border-l-8 border-red-700 pl-4">
+        Panel de Control
+    </h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        
+        <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-green-600">
+            <div class="text-gray-500 font-bold text-sm uppercase mb-2">Ventas de Hoy</div>
+            <div class="text-4xl font-black text-gray-800">C$ {{ total_ventas_hoy|floatformat:2 }}</div>
+            <div class="text-sm text-green-600 mt-2 font-bold">Ingresos brutos</div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-600">
+            <div class="text-gray-500 font-bold text-sm uppercase mb-2">Transacciones</div>
+            <div class="text-4xl font-black text-gray-800">{{ cantidad_ventas_hoy }}</div>
+            <div class="text-sm text-blue-600 mt-2 font-bold">Facturas emitidas hoy</div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-md border-t-4 {% if productos_bajo_stock > 0 %}border-red-600 bg-red-50{% else %}border-gray-300{% endif %}">
+            <div class="text-gray-500 font-bold text-sm uppercase mb-2">Alertas de Inventario</div>
+            <div class="text-4xl font-black {% if productos_bajo_stock > 0 %}text-red-700{% else %}text-gray-800{% endif %}">
+                {{ productos_bajo_stock }}
+            </div>
+            <div class="text-sm mt-2 font-bold">
+                {% if productos_bajo_stock > 0 %}
+                    <a href="{% url 'lista_productos' %}?q=" class="text-red-600 underline">Productos con stock bajo</a>
+                {% else %}
+                    <span class="text-green-600">Todo en orden</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Accesos Rápidos</h3>
+            <div class="grid grid-cols-2 gap-4">
+                <a href="{% url 'crear_venta' %}" class="bg-red-800 hover:bg-red-900 text-white p-4 rounded text-center font-bold transition">
+                    Nueva Venta
+                </a>
+                <a href="{% url 'agregar_producto' %}" class="bg-gray-800 hover:bg-gray-900 text-white p-4 rounded text-center font-bold transition">
+                    Agregar Producto
+                </a>
+                <a href="{% url 'lista_clientes' %}" class="bg-white border-2 border-gray-200 hover:border-red-600 text-gray-800 p-4 rounded text-center font-bold transition">
+                    Directorio Clientes
+                </a>
+                <a href="{% url 'lista_productos' %}" class="bg-white border-2 border-gray-200 hover:border-red-600 text-gray-800 p-4 rounded text-center font-bold transition">
+                    Ver Inventario
+                </a>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="bg-gray-100 p-4 border-b border-gray-200">
+                <h3 class="text-lg font-bold text-gray-800">Últimas Ventas</h3>
+            </div>
+            <table class="w-full text-left text-sm">
+                <tbody class="divide-y divide-gray-100">
+                    {% for v in ultimas_ventas %}
+                    <tr>
+                        <td class="p-3 font-bold text-gray-700">#{{ v.id_venta }}</td>
+                        <td class="p-3 text-gray-600">{{ v.cliente.nombres|default:"Consumidor Final"|truncatechars:20 }}</td>
+                        <td class="p-3 text-right font-bold text-gray-900">C$ {{ v.total }}</td>
+                        <td class="p-3 text-right text-xs text-gray-400">{{ v.fecha_venta|date:"H:i" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td class="p-4 text-center text-gray-500">Sin movimientos hoy</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

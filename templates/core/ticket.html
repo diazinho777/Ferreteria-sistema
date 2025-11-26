@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Ticket #{{ venta.id_venta }}</title>
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace; /* Fuente tipo ticket */
+            width: 80mm; /* Ancho estándar de impresoras térmicas */
+            margin: 0 auto;
+            padding: 5px;
+            color: #000;
+            background: #fff;
+            font-size: 12px;
+        }
+        .centrado { text-align: center; }
+        .titulo { font-size: 1.2em; font-weight: bold; }
+        .linea { border-bottom: 1px dashed #000; margin: 5px 0; }
+        
+        table { width: 100%; border-collapse: collapse; }
+        td { vertical-align: top; }
+        .precio { text-align: right; white-space: nowrap; }
+        .cant { text-align: center; width: 25px; }
+        .producto { padding-right: 5px; }
+        
+        .total-container { 
+            font-size: 1.3em; 
+            font-weight: bold; 
+            text-align: right; 
+            margin-top: 10px;
+        }
+        
+        /* Ocultar botón de imprimir al imprimir en papel real */
+        @media print {
+            .no-print { display: none; }
+            body { margin: 0; padding: 0; }
+        }
+        
+        .btn-imprimir {
+            width: 100%;
+            padding: 10px;
+            background: #000;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 10px;
+            font-family: sans-serif;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <button onclick="window.print()" class="btn-imprimir no-print">🖨 IMPRIMIR TICKET</button>
+
+    <div class="centrado">
+        <div class="titulo">{{ empresa.nombre }}</div>
+        <div>{{ empresa.direccion }}</div>
+        <div>Tel: {{ empresa.telefono }}</div>
+        <div>RUC: {{ empresa.ruc }}</div>
+    </div>
+    
+    <div class="linea"></div>
+    
+    <div>
+        <strong>Ticket:</strong> #{{ venta.id_venta }}<br>
+        <strong>Fecha:</strong> {{ venta.fecha_venta|date:"d/m/Y H:i" }}<br>
+        <strong>Vendedor:</strong> {{ venta.usuario.username }}<br>
+        <strong>Cliente:</strong> {{ venta.cliente.nombres|default:"Consumidor Final" }}
+        {% if venta.cliente.cedula_ruc %}
+        <br><strong>RUC/Céd:</strong> {{ venta.cliente.cedula_ruc }}
+        {% endif %}
+    </div>
+
+    <div class="linea"></div>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="text-align:left">Cant.</th>
+                <th style="text-align:left">Descripción</th>
+                <th class="precio">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in detalles %}
+            <tr>
+                <td class="cant">{{ item.cantidad }}</td>
+                <td class="producto">{{ item.producto.nombre|truncatechars:20 }}</td>
+                <td class="precio">{{ item.subtotal }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="linea"></div>
+
+    <div class="total-container">
+        TOTAL: C$ {{ venta.total }}
+    </div>
+
+    <div class="centrado" style="margin-top: 15px; font-size: 0.9em;">
+        ¡Gracias por su compra!<br>
+        *** NO SE ACEPTAN DEVOLUCIONES ***
+    </div>
+
+    <script>
+        // Opcional: Descomenta la siguiente línea si quieres que imprima solo al abrir
+        // window.onload = function() { window.print(); }
+    </script>
+</body>
+</html>
