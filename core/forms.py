@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import Producto, User, Categoria
+from .models import Producto, User, Categoria, Proveedor
 
 # 1. FORMULARIO DE PRODUCTOS (Para el Inventario)
 class ProductoForm(forms.ModelForm):
@@ -63,4 +63,18 @@ class CategoriaForm(forms.ModelForm):
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'w-full p-2 border border-gray-300 rounded focus:border-red-600 focus:outline-none', 'placeholder': 'Ej: Herramientas Eléctricas'}),
             'descripcion': forms.Textarea(attrs={'class': 'w-full p-2 border border-gray-300 rounded focus:border-red-600 focus:outline-none', 'rows': 3, 'placeholder': 'Descripción opcional...'}),
+        }
+        
+        
+# 4. FORMULARIO DE PROVEEDORES
+class ProveedorForm(forms.ModelForm):
+    class Meta:
+        model = Proveedor
+        fields = ['empresa', 'ruc', 'direccion', 'telefono', 'email']
+        widgets = {
+            'empresa': forms.TextInput(attrs={'class': 'w-full p-2 border border-gray-300 rounded focus:border-red-600 focus:outline-none'}),
+            'ruc': forms.TextInput(attrs={'class': 'w-full p-2 border border-gray-300 rounded focus:border-red-600 focus:outline-none'}),
+            'direccion': forms.TextInput(attrs={'class': 'w-full p-2 border border-gray-300 rounded focus:border-red-600 focus:outline-none'}),
+            'telefono': forms.TextInput(attrs={'class': 'w-full p-2 border border-gray-300 rounded focus:border-red-600 focus:outline-none'}),
+            'email': forms.EmailInput(attrs={'class': 'w-full p-2 border border-gray-300 rounded focus:border-red-600 focus:outline-none'}),
         }

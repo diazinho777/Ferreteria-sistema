@@ -12,7 +12,7 @@
             <input type="text" 
                    name="q" 
                    value="{{ busqueda|default:'' }}"
-                   placeholder="Buscar por nombre o RUC..." 
+                   placeholder="Buscar por nombre o cedula..." 
                    class="w-full p-3 border-2 border-gray-300 rounded-l-md focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600">
             <button type="submit" class="bg-gray-900 text-white px-6 font-bold rounded-r-md hover:bg-gray-800 transition">
                 BUSCAR
@@ -22,10 +22,11 @@
 
     <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
         <table class="w-full text-left border-collapse">
-            <thead class="bg-red-800 text-white">
+            <!-- AQUÍ ESTÁ EL CAMBIO: bg-gray-900 -->
+            <thead class="bg-gray-900 text-white">
                 <tr>
                     <th class="p-4 font-bold uppercase text-sm">Nombre</th>
-                    <th class="p-4 font-bold uppercase text-sm">Cédula / RUC</th>
+                    <th class="p-4 font-bold uppercase text-sm">Cédula</th>
                     <th class="p-4 font-bold uppercase text-sm">Contacto</th>
                     <th class="p-4 font-bold uppercase text-sm text-center">Compras</th>
                     <th class="p-4 font-bold uppercase text-sm text-right">Total Gastado</th>

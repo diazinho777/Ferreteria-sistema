@@ -38,4 +38,12 @@ urlpatterns = [
     path('categorias/', views.lista_categorias, name='lista_categorias'),
     path('categorias/agregar/', views.agregar_categoria, name='agregar_categoria'),
     path('categorias/editar/<int:id_categoria>/', views.editar_categoria, name='editar_categoria'),
+    
+    # PROVEEDORES
+    path('proveedores/', views.lista_proveedores, name='lista_proveedores'),
+    path('proveedores/agregar/', views.agregar_proveedor, name='agregar_proveedor'),
+    
+    # COMPRAS
+    path('compras/nueva/', views.crear_compra, name='crear_compra'),
+    path('api/guardar-compra/', views.guardar_compra, name='api_guardar_compra'),
 ]

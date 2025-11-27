@@ -37,6 +37,7 @@ class Proveedor(models.Model):
     id_proveedor = models.AutoField(primary_key=True)
     empresa = models.CharField(max_length=100)
     ruc = models.CharField(max_length=20, unique=True)
+    email = models.EmailField(blank=True, null=True)
     telefono = models.CharField(max_length=20)
     direccion = models.TextField()
 

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-3xl font-extrabold text-gray-900 border-l-8 border-red-700 pl-4">Proveedores</h2>
+        <a href="{% url 'agregar_proveedor' %}" class="bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded-md font-bold shadow-md">+ Nuevo Proveedor</a>
+    </div>
+    <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
+        <table class="w-full text-left border-collapse">
+            <thead class="bg-gray-900 text-white">
+                <tr>
+                    <th class="p-4">Empresa</th>
+                    <th class="p-4">RUC</th>
+                    <th class="p-4">Teléfono</th>
+                    <th class="p-4">Dirección</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% for p in proveedores %}
+                <tr class="hover:bg-red-50">
+                    <td class="p-4 font-bold">{{ p.empresa }}</td>
+                    <td class="p-4">{{ p.ruc }}</td>
+                    <td class="p-4">{{ p.telefono }}</td>
+                    <td class="p-4 text-sm">{{ p.direccion }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="p-8 text-center text-gray-500">Sin proveedores.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

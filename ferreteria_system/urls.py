@@ -16,6 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     
@@ -28,3 +30,6 @@ urlpatterns = [
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home' # A dónde va después de entrar
 LOGOUT_REDIRECT_URL = 'login' # A dónde va después de salir
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -7,107 +7,132 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
-    
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
     <style>
-        /* Ocultar flechas en inputs de tipo number */
         input[type=number]::-webkit-inner-spin-button, 
         input[type=number]::-webkit-outer-spin-button { 
-          -webkit-appearance: none; 
-          margin: 0; 
+          -webkit-appearance: none; margin: 0; 
         }
         input[type=number] { -moz-appearance:textfield; }
+        [x-cloak] { display: none !important; }
     </style>
 </head>
-<body class="bg-gray-100 font-sans">
+<body class="bg-gray-100 font-sans flex h-screen overflow-hidden">
 
-    <nav class="bg-red-800 p-4 shadow-lg text-white mb-6">
-        <div class="container mx-auto flex justify-between items-center">
-            
-            <div class="flex items-center gap-8">
-                <h1 class="text-2xl font-bold tracking-tight">FERRETERÍA REDENTOR</h1>
-                
-                <div class="hidden md:flex items-center gap-4 text-sm">
-                    
-                    {% if user.role == 'admin' %}
-                    <a href="{% url 'home' %}" class="hover:text-red-200 font-medium flex items-center gap-2 transition hover:bg-red-900 hover:bg-opacity-30 px-3 py-2 rounded-md">
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                        </svg>
-                        Panel
-                    </a>
-                    {% endif %}
-                    
-                    <a href="{% url 'crear_venta' %}" class="hover:text-red-200 font-medium flex items-center gap-2 transition bg-red-900 bg-opacity-30 px-3 py-2 rounded-md hover:bg-opacity-50">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-                        Vender
-                    </a>
-
-                    <a href="{% url 'lista_productos' %}" class="hover:text-red-200 font-medium flex items-center gap-2 transition hover:bg-red-900 hover:bg-opacity-30 px-3 py-2 rounded-md">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                        </svg>
-                        Inventario
-                    </a>
-
-                    {% if user.role == 'admin' %}
-                    <a href="{% url 'lista_categorias' %}" class="hover:text-red-200 font-medium flex items-center gap-2 transition hover:bg-red-900 hover:bg-opacity-30 px-3 py-2 rounded-md">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                        </svg>
-                        Categorías
-                    </a>
-                    {% endif %}
-
-                    <a href="{% url 'lista_clientes' %}" class="hover:text-red-200 font-medium flex items-center gap-2 transition hover:bg-red-900 hover:bg-opacity-30 px-3 py-2 rounded-md">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-                        Clientes
-                    </a>
-
-                    {% if user.role == 'admin' %}
-                    <a href="{% url 'crear_empleado' %}" class="hover:text-red-200 font-medium flex items-center gap-2 transition border border-red-400 px-3 py-2 rounded-md hover:bg-red-700 ml-4">
-                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                        </svg>
-                        Crear Empleado
-                    </a>
-                    {% endif %}
-
-                </div>
-            </div>
-
-            <div>
-                {% if user.is_authenticated %}
-                    <div class="flex items-center gap-4">
-                        
-                        <div class="text-right leading-tight">
-                            <span class="block text-red-100 font-bold text-sm">{{ user.username }}</span>
-                            <span class="text-xs bg-red-900 text-red-200 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                                {{ user.role }}
-                            </span>
-                        </div>
-                        
-                        <form action="{% url 'logout' %}" method="post">
-                            {% csrf_token %}
-                            <button type="submit" class="bg-red-900 hover:bg-black text-white px-4 py-2 rounded text-sm font-bold transition shadow-md border border-red-900 hover:border-gray-800">
-                                SALIR
-                            </button>
-                        </form>
-
-                    </div>
-                {% endif %}
-            </div>
+    <aside class="w-64 bg-red-900 text-white flex flex-col flex-shrink-0 transition-all duration-300 shadow-2xl z-20">
+        
+        <div class="h-16 flex items-center justify-center bg-red-950 shadow-md border-b border-red-800">
+            <h1 class="text-xl font-extrabold tracking-widest uppercase">FERRETERÍA REDENTOR</h1>
         </div>
-    </nav>
 
-    <div class="container mx-auto p-4">
-        {% block content %}
-        {% endblock %}
+        <nav class="flex-1 px-4 py-6 space-y-3 overflow-y-auto">
+            
+            {% if user.role == 'admin' %}
+            <a href="{% url 'home' %}" 
+               class="flex items-center px-4 py-3 transition-colors rounded-lg group
+               {% if request.resolver_match.url_name == 'home' %} bg-red-700 text-white shadow-md font-bold border-l-4 border-white {% else %} text-red-100 hover:bg-red-800 hover:text-white {% endif %}">
+                <svg class="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                <span class="mx-3">Panel de Control</span>
+            </a>
+            {% endif %}
+
+            <a href="{% url 'crear_venta' %}" 
+               class="flex items-center px-4 py-3 transition-colors rounded-lg group
+               {% if request.resolver_match.url_name == 'crear_venta' %} bg-red-700 text-white shadow-md font-bold border-l-4 border-white {% else %} text-red-100 hover:bg-red-800 hover:text-white {% endif %}">
+                <svg class="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                <span class="mx-3">Realizar Venta</span>
+            </a>
+
+            {% if user.role == 'admin' %}
+            <a href="{% url 'crear_compra' %}" 
+               class="flex items-center px-4 py-3 transition-colors rounded-lg group
+               {% if request.resolver_match.url_name == 'crear_compra' %} bg-red-700 text-white shadow-md font-bold border-l-4 border-white {% else %} text-red-100 hover:bg-red-800 hover:text-white {% endif %}">
+                <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span class="mx-3">Entrada Stock</span>
+            </a>
+            {% endif %}
+
+            <a href="{% url 'lista_productos' %}" 
+               class="flex items-center px-4 py-3 transition-colors rounded-lg group
+               {% if 'inventario' in request.path %} bg-red-700 text-white shadow-md font-bold border-l-4 border-white {% else %} text-red-100 hover:bg-red-800 hover:text-white {% endif %}">
+                <svg class="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
+                <span class="mx-3">Inventario</span>
+            </a>
+
+            {% if user.role == 'admin' %}
+            <a href="{% url 'lista_categorias' %}" 
+               class="flex items-center px-4 py-3 transition-colors rounded-lg group
+               {% if 'categorias' in request.path %} bg-red-700 text-white shadow-md font-bold border-l-4 border-white {% else %} text-red-100 hover:bg-red-800 hover:text-white {% endif %}">
+                <svg class="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
+                <span class="mx-3">Categorías</span>
+            </a>
+            {% endif %}
+
+            {% if user.role == 'admin' %}
+            <a href="{% url 'lista_proveedores' %}" 
+               class="flex items-center px-4 py-3 transition-colors rounded-lg group
+               {% if 'proveedores' in request.path %} bg-red-700 text-white shadow-md font-bold border-l-4 border-white {% else %} text-red-100 hover:bg-red-800 hover:text-white {% endif %}">
+                <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                <span class="mx-3">Proveedores</span>
+            </a>
+            {% endif %}
+
+            <a href="{% url 'lista_clientes' %}" 
+               class="flex items-center px-4 py-3 transition-colors rounded-lg group
+               {% if 'clientes' in request.path %} bg-red-700 text-white shadow-md font-bold border-l-4 border-white {% else %} text-red-100 hover:bg-red-800 hover:text-white {% endif %}">
+                <svg class="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                <span class="mx-3">Clientes</span>
+            </a>
+
+            {% if user.role == 'admin' %}
+            <div class="pt-4 mt-4 border-t border-red-800">
+                <a href="{% url 'crear_empleado' %}" 
+                   class="flex items-center px-4 py-3 transition-colors rounded-lg group
+                   {% if request.resolver_match.url_name == 'crear_empleado' %} bg-red-700 text-white shadow-md font-bold border-l-4 border-white {% else %} text-red-100 hover:bg-red-800 hover:text-white {% endif %}">
+                    <svg class="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
+                    <span class="mx-3">Crear Empleado</span>
+                </a>
+            </div>
+            {% endif %}
+
+        </nav>
+
+        <div class="p-4 bg-red-950 text-xs text-center text-red-300/70">
+            Sistema Ferretería v1.0
+        </div>
+    </aside>
+
+    <div class="flex-1 flex flex-col overflow-hidden">
+        
+        <header class="flex justify-end items-center py-4 px-8 bg-gray-900 shadow-md border-b border-gray-800 h-16">
+            {% if user.is_authenticated %}
+                <div class="flex items-center gap-6">
+                    <div class="text-right">
+                        <p class="text-sm font-bold text-white">{{ user.username }}</p>
+                        <span class="text-[10px] bg-gray-700 text-gray-300 px-2 py-0.5 rounded-full uppercase font-bold tracking-wide border border-gray-600">
+                            {{ user.role }}
+                        </span>
+                    </div>
+                    
+                    <form action="{% url 'logout' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="flex items-center gap-2 text-gray-400 hover:text-white transition font-bold text-sm bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-md border border-gray-700">
+                            Salir
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                        </button>
+                    </form>
+                </div>
+            {% endif %}
+        </header>
+
+        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-8">
+            {% block content %}
+            {% endblock %}
+        </main>
+
     </div>
 
 </body>

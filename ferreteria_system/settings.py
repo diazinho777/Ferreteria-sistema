@@ -109,9 +109,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'es'
+LANGUAGE_CODE = 'es-ni'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Managua'
 
 USE_I18N = True
 
@@ -134,6 +134,10 @@ AUTH_USER_MODEL = 'core.User'
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'   # <--- ESTA ES LA QUE TE FALTA O ESTÁ MAL
 LOGOUT_REDIRECT_URL = 'login'
+
+# Configuración de Archivos Media (Imágenes)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # --- PARCHE PARA MARIADB 10.4 (XAMPP) ---
 # Esto evita el error: syntax to use near 'RETURNING'

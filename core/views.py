@@ -7,8 +7,8 @@ from django.contrib.auth.forms import UserCreationForm
 from django.db import transaction
 from django.db.models import Q, Count, Sum, F
 from django.utils import timezone
-from .models import Producto, Venta, DetalleVenta, Cliente, Categoria
-from .forms import ProductoForm, RegistroEmpleadoForm, CategoriaForm
+from .models import Producto, Venta, DetalleVenta, Cliente, Categoria, Proveedor, Compra, DetalleCompra
+from .forms import ProductoForm, RegistroEmpleadoForm, CategoriaForm, ProveedorForm
 
 # ==========================================
 # 1. GESTIÓN DE ACCESO Y DASHBOARD
@@ -316,3 +316,81 @@ def editar_categoria(request, id_categoria):
         form = CategoriaForm(instance=categoria)
     
     return render(request, 'core/form_categoria.html', {'form': form, 'titulo': 'Editar Categoría'})
+
+# 7. PROVEEDORES (Solo Admin)
+# ==========================================
+@login_required
+def lista_proveedores(request):
+    if request.user.role != 'admin': return redirect('home')
+    proveedores = Proveedor.objects.all()
+    return render(request, 'core/lista_proveedores.html', {'proveedores': proveedores})
+
+@login_required
+def agregar_proveedor(request):
+    if request.user.role != 'admin': return redirect('home')
+    if request.method == 'POST':
+        form = ProveedorForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('lista_proveedores')
+    else:
+        form = ProveedorForm()
+    return render(request, 'core/form_proveedor.html', {'form': form, 'titulo': 'Nuevo Proveedor'})
+
+# ==========================================
+# 8. COMPRAS (ENTRADA DE STOCK)
+# ==========================================
+@login_required
+def crear_compra(request):
+    if request.user.role != 'admin': return redirect('home')
+    proveedores = Proveedor.objects.all()
+    return render(request, 'core/compra.html', {'proveedores': proveedores})
+
+@csrf_exempt
+@login_required
+def guardar_compra(request):
+    """Igual que venta, pero AUMENTA stock"""
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        items = data.get('items', [])
+        total = data.get('total', 0)
+        id_proveedor = data.get('id_proveedor')
+
+        if not items or not id_proveedor:
+            return JsonResponse({'status': 'error', 'mensaje': 'Datos incompletos'})
+
+        try:
+            with transaction.atomic():
+                proveedor = Proveedor.objects.get(id_proveedor=id_proveedor)
+                
+                # 1. Crear Cabecera Compra
+                nueva_compra = Compra.objects.create(
+                    proveedor=proveedor,
+                    usuario=request.user,
+                    total=total
+                )
+
+                # 2. Detalles y AUMENTAR Stock
+                for item in items:
+                    producto = Producto.objects.get(id_producto=item['id'])
+                    
+                    DetalleCompra.objects.create(
+                        compra=nueva_compra,
+                        producto=producto,
+                        cantidad=item['cantidad'],
+                        costo_unitario=item['precio'], # Aquí es Precio de COSTO
+                        subtotal=item['precio'] * item['cantidad']
+                    )
+                    
+                    # AUMENTAMOS STOCK
+                    producto.stock += item['cantidad']
+                    # Actualizamos el costo del producto al nuevo precio de compra
+                    producto.precio_compra = item['precio'] 
+                    producto.save()
+
+            return JsonResponse({'status': 'ok'})
+
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'mensaje': str(e)})
+            
+    return JsonResponse({'status': 'error'})
