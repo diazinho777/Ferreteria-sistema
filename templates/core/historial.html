@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-3xl font-extrabold text-gray-900 border-l-8 border-gray-800 pl-4">
+            Kardex: <span class="text-red-700">{{ producto.nombre }}</span>
+        </h2>
+        <a href="{% url 'lista_productos' %}" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-md font-bold transition flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            Volver
+        </a>
+    </div>
+
+    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6 flex items-center gap-4">
+        <div class="p-3 bg-blue-100 rounded-full text-blue-600">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+        </div>
+        <div>
+            <p class="text-sm text-gray-500 font-bold uppercase">Stock Actual</p>
+            <p class="text-2xl font-black text-gray-900">{{ producto.stock }} <span class="text-sm font-normal text-gray-500">{{ producto.get_unidad_display }}</span></p>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
+        <table class="w-full text-left text-sm">
+            <thead class="bg-gray-900 text-white">
+                <tr>
+                    <th class="p-4">Fecha / Hora</th>
+                    <th class="p-4 text-center">Tipo Movimiento</th>
+                    <th class="p-4 text-center">Cantidad</th>
+                    <th class="p-4">Responsable</th>
+                    <th class="p-4">Detalle / Referencia</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% for m in movimientos %}
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="p-4 text-gray-600 font-mono">{{ m.fecha|date:"d/m/Y H:i" }}</td>
+                    
+                    <td class="p-4 text-center font-bold">
+                        {% if m.tipo == 'entrada' %}
+                            <span class="text-green-600 bg-green-100 px-2 py-1 rounded-full text-xs">⬇ ENTRADA</span>
+                        {% elif m.tipo == 'salida' %}
+                            <span class="text-red-600 bg-red-100 px-2 py-1 rounded-full text-xs">⬆ SALIDA</span>
+                        {% elif m.tipo == 'ajuste_pos' %}
+                            <span class="text-blue-600 bg-blue-100 px-2 py-1 rounded-full text-xs">+ AJUSTE</span>
+                        {% else %}
+                            <span class="text-orange-600 bg-orange-100 px-2 py-1 rounded-full text-xs">- AJUSTE</span>
+                        {% endif %}
+                    </td>
+
+                    <td class="p-4 text-center font-black text-gray-800 text-lg">
+                        {{ m.cantidad }}
+                    </td>
+
+                    <td class="p-4">
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center text-xs font-bold text-gray-600">
+                                {{ m.usuario.username|slice:":1"|upper }}
+                            </div>
+                            {{ m.usuario.username }}
+                        </div>
+                    </td>
+
+                    <td class="p-4 text-gray-500 italic">
+                        {{ m.descripcion }}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="p-8 text-center text-gray-400 italic">
+                        No hay movimientos registrados para este producto.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+{% endblock %}

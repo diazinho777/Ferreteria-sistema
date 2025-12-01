@@ -46,4 +46,24 @@ urlpatterns = [
     # COMPRAS
     path('compras/nueva/', views.crear_compra, name='crear_compra'),
     path('api/guardar-compra/', views.guardar_compra, name='api_guardar_compra'),
+    
+    path('finanzas/', views.reporte_financiero, name='reporte_financiero'),
+    
+    path('inventario/reportar-perdida/<int:id_producto>/', views.reportar_perdida, name='reportar_perdida'),
+    
+    path('inventario/eliminar/<int:id_producto>/', views.eliminar_producto, name='eliminar_producto'),
+    
+    path('inventario/activar/<int:id_producto>/', views.activar_producto, name='activar_producto'),
+    
+    path('clientes/editar/<int:id_cliente>/', views.editar_cliente, name='editar_cliente'),
+    
+    path('proveedores/editar/<int:id_proveedor>/', views.editar_proveedor, name='editar_proveedor'),
+    
+    path('inventario/historial/<int:id_producto>/', views.historial_producto, name='historial_producto'),
+    
+    # GESTIÓN DE EMPLEADOS
+    path('usuarios/', views.lista_empleados, name='lista_empleados'), # Lista
+    path('usuarios/crear/', views.crear_empleado, name='crear_empleado'), # Crear (Ya la tenías)
+    path('usuarios/editar/<int:id_usuario>/', views.editar_empleado, name='editar_empleado'), # Editar
+    path('usuarios/estado/<int:id_usuario>/', views.estado_empleado, name='estado_empleado'), # Banear/Activar
 ]

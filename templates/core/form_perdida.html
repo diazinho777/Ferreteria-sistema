@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-md mx-auto mt-10">
+    
+    <div class="bg-white rounded-lg shadow-lg border-t-8 border-red-600 overflow-hidden">
+        <div class="bg-red-50 p-6 border-b border-red-100">
+            <h2 class="text-2xl font-bold text-red-800">Reportar Daño o Pérdida</h2>
+            <p class="text-sm text-red-600 mt-1">Estás a punto de reducir el stock de: <strong>{{ producto.nombre }}</strong></p>
+        </div>
+
+        <form method="post" class="p-8 space-y-6">
+            {% csrf_token %}
+            
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Cantidad Dañada / Perdida</label>
+                <input type="number" name="cantidad" step="0.01" min="0.01" max="{{ producto.stock }}" required
+                       class="w-full p-3 border-2 border-red-200 rounded focus:border-red-600 focus:outline-none bg-red-50 font-bold text-red-900">
+                <p class="text-xs text-gray-500 mt-1">Stock actual: {{ producto.stock }}</p>
+            </div>
+
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Motivo / Explicación</label>
+                <textarea name="motivo" rows="3" required placeholder="Ej: Se rompió al descargar, Robo hormiga, Vencido..."
+                          class="w-full p-3 border-2 border-gray-300 rounded focus:border-red-600 focus:outline-none"></textarea>
+            </div>
+
+            <div class="flex gap-4">
+                <a href="{% url 'lista_productos' %}" class="w-1/2 bg-gray-200 text-gray-700 font-bold py-3 rounded text-center hover:bg-gray-300 transition">
+                    Cancelar
+                </a>
+                <button type="submit" class="w-1/2 bg-red-700 text-white font-bold py-3 rounded hover:bg-red-800 transition shadow-md flex justify-center items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    DAR DE BAJA
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

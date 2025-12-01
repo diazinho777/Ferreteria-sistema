@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-3xl font-extrabold text-gray-900 border-l-8 border-red-700 pl-4">
+            Equipo de Trabajo
+        </h2>
+        <a href="{% url 'crear_empleado' %}" class="bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded-md font-bold shadow-md flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
+            Nuevo Empleado
+        </a>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
+        <table class="w-full text-left border-collapse">
+            <thead class="bg-gray-900 text-white">
+                <tr>
+                    <th class="p-4">Usuario</th>
+                    <th class="p-4">Nombre Completo</th>
+                    <th class="p-4">Cédula</th>
+                    <th class="p-4">Contacto</th>
+                    <th class="p-4 text-center">Estado</th>
+                    <th class="p-4 text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% for e in empleados %}
+                <tr class="hover:bg-gray-50 transition {% if not e.is_active %}bg-gray-100 text-gray-400{% endif %}">
+                    
+                    <td class="p-4 font-bold">
+                        {{ e.username }}
+                        <span class="block text-xs font-normal text-gray-500 uppercase">{{ e.role }}</span>
+                    </td>
+                    
+                    <td class="p-4">{{ e.first_name }} {{ e.last_name }}</td>
+                    <td class="p-4 text-sm font-mono">{{ e.cedula|default:"---" }}</td>
+                    <td class="p-4 text-sm">
+                        {% if e.telefono %}📞 {{ e.telefono }}<br>{% endif %}
+                        {% if e.direccion %}📍 {{ e.direccion|truncatechars:20 }}{% endif %}
+                    </td>
+                    
+                    <td class="p-4 text-center">
+                        {% if e.is_active %}
+                            <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-bold">ACTIVO</span>
+                        {% else %}
+                            <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full font-bold">INACTIVO</span>
+                        {% endif %}
+                    </td>
+
+                    <td class="p-4 text-center flex justify-center items-center gap-2">
+                        
+                        <a href="{% url 'editar_empleado' e.id %}" class="text-blue-600 hover:text-blue-800 p-1" title="Editar Datos">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                        </a>
+
+                        {% if e.is_active %}
+                            <a href="{% url 'estado_empleado' e.id %}" class="text-red-500 hover:text-red-700 p-1" title="Dar de Baja (Bloquear Acceso)" onclick="return confirm('¿Seguro que deseas bloquear el acceso a este empleado?')">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
+                            </a>
+                        {% else %}
+                            <a href="{% url 'estado_empleado' e.id %}" class="text-green-500 hover:text-green-700 p-1" title="Reactivar Acceso">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            </a>
+                        {% endif %}
+
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="p-8 text-center text-gray-500">No hay empleados registrados.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

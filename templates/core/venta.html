@@ -12,7 +12,7 @@
                     <div class="relative w-full">
                         <input type="text" 
                                x-model="clienteNombreDisplay"
-                               placeholder="Buscar cliente por nombre o cedula"
+                               placeholder="Buscar cliente por nombre o cédula..."
                                @input="buscarClientes($event.target.value)"
                                @focus="open = true" 
                                @click.outside="open = false"
@@ -22,19 +22,22 @@
                              class="absolute z-10 w-full bg-white border border-gray-300 mt-1 rounded shadow-xl max-h-48 overflow-y-auto">
                             <template x-for="c in listaClientes" :key="c.id">
                                 <div @click="seleccionarCliente(c)" 
-                                     class="p-2 hover:bg-red-50 cursor-pointer border-b border-gray-100 text-sm">
+                                     class="p-2 hover:bg-red-50 cursor-pointer border-b border-gray-100 text-sm flex justify-between">
                                     <span x-text="c.text"></span>
+                                    <span x-show="c.es_vip" class="text-yellow-600 font-bold text-xs bg-yellow-100 px-2 rounded-full border border-yellow-300">⭐ VIP</span>
                                 </div>
                             </template>
                         </div>
                     </div>
 
-                    <button @click="modalClienteOpen = true" 
-                            class="bg-gray-800 text-white px-4 rounded hover:bg-gray-700 font-bold"
-                            title="Nuevo Cliente">
-                        +
-                    </button>
+                    <button @click="modalClienteOpen = true" class="bg-gray-800 text-white px-4 rounded hover:bg-gray-700 font-bold">+</button>
                 </div>
+                
+                <div x-show="esVip" class="mt-2 flex items-center text-yellow-700 bg-yellow-50 p-2 rounded border border-yellow-200 text-sm animate-pulse">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                    <strong>¡Cliente Frecuente!</strong> &nbsp; Considera aplicar un descuento.
+                </div>
+                
                 <small class="text-gray-500" x-show="!clienteId">Por defecto: Consumidor Final</small>
             </div>
 
@@ -49,19 +52,15 @@
         <h2 class="text-xl font-bold mb-4 text-gray-800">Agregar Productos</h2>
         <div class="flex flex-wrap md:flex-nowrap gap-4 mb-4">
             <div class="flex-grow">
-                <input type="number" x-model="idInput" @keydown.enter="buscarProducto()"
-                       placeholder="ID Producto..." id="input-producto"
-                       class="w-full p-3 border-2 border-gray-300 rounded focus:border-red-600 focus:outline-none">
+                <input type="number" x-model="idInput" @keydown.enter="buscarProducto()" placeholder="ID Producto..." id="input-producto" class="w-full p-3 border-2 border-gray-300 rounded focus:border-red-600 focus:outline-none">
             </div>
             <div class="w-24">
-                <input type="number" x-model.number="cantidadInput" class="w-full p-3 border-2 border-gray-300 rounded text-center" min="1">
+                <input type="number" x-model="cantidadInput" step="0.01" min="0.1" class="w-full p-3 border-2 border-gray-300 rounded text-center focus:border-red-600 focus:outline-none">
             </div>
-            <button @click="buscarProducto()" class="bg-red-700 text-white px-6 rounded font-bold hover:bg-red-800">
-                AGREGAR
-            </button>
+            <button @click="buscarProducto()" class="bg-red-700 text-white px-6 rounded font-bold hover:bg-red-800 transition">AGREGAR</button>
         </div>
 
-        <div x-show="mensajeError" class="bg-red-100 text-red-800 p-3 rounded mb-4" x-text="mensajeError" style="display: none;"></div>
+        <div x-show="mensajeError" class="bg-red-100 text-red-800 p-3 rounded mb-4 font-bold border-l-4 border-red-600" x-text="mensajeError" style="display: none;"></div>
 
         <table class="w-full border-collapse">
             <thead class="bg-gray-900 text-white">
@@ -80,139 +79,72 @@
                         <td class="p-3 text-right">C$ <span x-text="item.precio.toFixed(2)"></span></td>
                         <td class="p-3 text-center" x-text="item.cantidad"></td>
                         <td class="p-3 text-right font-bold">C$ <span x-text="(item.precio * item.cantidad).toFixed(2)"></span></td>
-                        <td class="p-3 text-center">
-                            <button @click="eliminarItem(index)" class="text-red-500 hover:text-red-700 font-bold">X</button>
-                        </td>
+                        <td class="p-3 text-center"><button @click="eliminarItem(index)" class="text-red-500 hover:text-red-700 font-bold px-2">✕</button></td>
                     </tr>
                 </template>
-                <tr x-show="carrito.length === 0"><td colspan="5" class="p-6 text-center text-gray-400">Carrito vacío</td></tr>
+                <tr x-show="carrito.length === 0"><td colspan="5" class="p-6 text-center text-gray-400 italic">Carrito vacío</td></tr>
             </tbody>
         </table>
     </div>
 
-    <div class="flex justify-end items-center gap-6 bg-white p-6 rounded-lg shadow-md">
-        <div class="text-right">
-            <span class="block text-sm text-gray-500 font-bold">TOTAL A PAGAR</span>
-            <div class="text-4xl font-black text-red-700">C$ <span x-text="totalVenta.toFixed(2)"></span></div>
+    <div class="flex flex-col items-end gap-2 bg-white p-6 rounded-lg shadow-md">
+        
+        <div class="flex justify-between w-full md:w-1/3 text-gray-600">
+            <span>Subtotal:</span>
+            <span class="font-bold">C$ <span x-text="subtotal.toFixed(2)"></span></span>
         </div>
+
+        <div class="flex justify-between items-center w-full md:w-1/3 text-red-600">
+            <span class="font-bold mr-2">Descuento (%):</span>
+            <input type="number" x-model="porcentajeDescuento" min="0" max="100" class="w-24 p-1 border border-red-300 rounded text-right font-bold text-red-700 focus:outline-none focus:border-red-600">
+        </div>
+        
+        <div class="flex justify-between w-full md:w-1/3 text-red-600 text-sm border-b pb-2 mb-2">
+            <span>Ahorro:</span>
+            <span>- C$ <span x-text="montoDescuento.toFixed(2)"></span></span>
+        </div>
+
+        <div class="flex justify-between items-center w-full md:w-1/3">
+            <span class="block text-lg font-bold text-gray-800 uppercase">Total a Pagar</span>
+            <div class="text-4xl font-black text-red-700">C$ <span x-text="totalFinal.toFixed(2)"></span></div>
+        </div>
+
         <button @click="procesarVenta()" :disabled="carrito.length === 0"
-                class="bg-red-700 text-white px-8 py-4 rounded font-bold hover:bg-red-800 disabled:opacity-50 disabled:cursor-not-allowed">
+                class="mt-4 bg-red-700 text-white px-8 py-4 rounded font-bold hover:bg-red-800 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg transition transform hover:scale-105 w-full md:w-auto">
             CONFIRMAR VENTA
         </button>
     </div>
 
-    <div x-show="modalClienteOpen" style="display: none;"
-         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        
+    <div x-show="modalClienteOpen" style="display: none;" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden" @click.away="modalClienteOpen = false">
-            <div class="bg-red-800 p-4 flex justify-between items-center">
-                <h3 class="text-white font-bold text-lg">Registrar Nuevo Cliente</h3>
-                <button @click="modalClienteOpen = false" class="text-white hover:text-gray-300 font-bold">✕</button>
-            </div>
-            
+            <div class="bg-red-800 p-4 flex justify-between items-center"><h3 class="text-white font-bold text-lg">Registrar Nuevo Cliente</h3><button @click="modalClienteOpen = false" class="text-white hover:text-gray-300 font-bold">✕</button></div>
             <div class="p-6 space-y-4">
-                <div>
-                    <label class="block text-sm font-bold text-gray-700">Nombre Completo *</label>
-                    <input type="text" x-model="nuevoCliente.nombres" class="w-full border p-2 rounded focus:border-red-600 focus:outline-none">
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-gray-700">Cédula / RUC</label>
-                    <input type="text" x-model="nuevoCliente.cedula_ruc" class="w-full border p-2 rounded focus:border-red-600 focus:outline-none">
-                </div>
-                <div class="flex gap-4">
-                    <div class="w-1/2">
-                        <label class="block text-sm font-bold text-gray-700">Teléfono</label>
-                        <input type="text" x-model="nuevoCliente.telefono" class="w-full border p-2 rounded focus:border-red-600 focus:outline-none">
-                    </div>
-                    <div class="w-1/2">
-                        <label class="block text-sm font-bold text-gray-700">Email</label>
-                        <input type="email" x-model="nuevoCliente.email" class="w-full border p-2 rounded focus:border-red-600 focus:outline-none">
-                    </div>
-                </div>
-                
+                <div><label class="block text-sm font-bold text-gray-700">Nombre *</label><input type="text" x-model="nuevoCliente.nombres" class="w-full border p-2 rounded"></div>
+                <div><label class="block text-sm font-bold text-gray-700">Cédula / RUC</label><input type="text" x-model="nuevoCliente.cedula_ruc" class="w-full border p-2 rounded"></div>
+                <div class="flex gap-4"><div class="w-1/2"><label class="block text-sm font-bold text-gray-700">Teléfono</label><input type="text" x-model="nuevoCliente.telefono" class="w-full border p-2 rounded"></div><div class="w-1/2"><label class="block text-sm font-bold text-gray-700">Email</label><input type="email" x-model="nuevoCliente.email" class="w-full border p-2 rounded"></div></div>
                 <div x-show="msgErrorModal" class="text-red-600 text-sm font-bold" x-text="msgErrorModal"></div>
-
-                <button @click="guardarNuevoCliente()" class="w-full bg-gray-900 text-white py-3 rounded font-bold hover:bg-gray-800 mt-4">
-                    GUARDAR Y SELECCIONAR
-                </button>
+                <button @click="guardarNuevoCliente()" class="w-full bg-gray-900 text-white py-3 rounded font-bold mt-4">GUARDAR</button>
             </div>
         </div>
     </div>
-    </div>
+
+</div>
 
 <script>
     function sistemaVentas() {
         return {
-            // Variables de Venta
-            idInput: '',
-            cantidadInput: 1,
-            carrito: [],
-            mensajeError: '',
-            
-            // Variables de Cliente
-            listaClientes: [],
-            clienteNombreDisplay: '', // Lo que se ve en el input
-            clienteId: null,          // Lo que se manda al backend
-            
-            // Variables Modal
-            modalClienteOpen: false,
-            msgErrorModal: '',
-            nuevoCliente: { nombres: '', cedula_ruc: '', telefono: '', email: '' },
+            idInput: '', cantidadInput: 1, carrito: [], mensajeError: '',
+            listaClientes: [], clienteNombreDisplay: '', clienteId: null, esVip: false, // Variable para controlar VIP
+            modalClienteOpen: false, msgErrorModal: '', nuevoCliente: { nombres: '', cedula_ruc: '', telefono: '', email: '' },
+            porcentajeDescuento: 0, // Variable para el descuento
 
-            get totalVenta() {
-                return this.carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
-            },
+            // Cálculos automáticos
+            get subtotal() { return this.carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0); },
+            get montoDescuento() { return this.subtotal * (this.porcentajeDescuento / 100); },
+            get totalFinal() { return this.subtotal - this.montoDescuento; },
 
-            init() {
-                this.$nextTick(() => document.getElementById('input-producto').focus());
-            },
+            init() { this.$nextTick(() => document.getElementById('input-producto').focus()); },
 
-            // --- LÓGICA CLIENTES ---
-            async buscarClientes(query) {
-                this.clienteNombreDisplay = query; // Actualiza visualmente
-                this.clienteId = null; // Si edita, reseteamos el ID seleccionado
-                
-                if (query.length < 2) {
-                    this.listaClientes = [];
-                    return;
-                }
-
-                const res = await fetch(`/api/clientes/buscar/?q=${query}`);
-                this.listaClientes = await res.json();
-            },
-
-            seleccionarCliente(cliente) {
-                this.clienteId = cliente.id;
-                this.clienteNombreDisplay = cliente.text;
-                this.listaClientes = []; // Cerrar lista
-            },
-
-            async guardarNuevoCliente() {
-                if(!this.nuevoCliente.nombres) {
-                    this.msgErrorModal = "El nombre es obligatorio";
-                    return;
-                }
-                
-                const res = await fetch('/api/clientes/crear/', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(this.nuevoCliente)
-                });
-                const data = await res.json();
-
-                if(data.status === 'ok') {
-                    // Seleccionar automáticamente al nuevo cliente
-                    this.seleccionarCliente(data.cliente);
-                    this.modalClienteOpen = false;
-                    this.nuevoCliente = { nombres: '', cedula_ruc: '', telefono: '', email: '' }; // Limpiar form
-                    this.msgErrorModal = '';
-                } else {
-                    this.msgErrorModal = "Error: " + data.mensaje;
-                }
-            },
-            // --- FIN LÓGICA CLIENTES ---
-
-            // --- LÓGICA PRODUCTOS (Igual que antes) ---
             async buscarProducto() {
                 if (!this.idInput) return;
                 this.mensajeError = '';
@@ -220,57 +152,69 @@
                     const res = await fetch(`/api/producto/${this.idInput}/`);
                     const data = await res.json();
                     if (data.encontrado) {
+                        let cant = parseFloat(this.cantidadInput);
+                        if (isNaN(cant) || cant <= 0) { this.mensajeError = "Cantidad inválida"; return; }
+                        
                         const existente = this.carrito.find(p => p.id === data.id);
-                        let cant = this.cantidadInput;
-                        if (existente) cant += existente.cantidad;
+                        let totalCant = cant + (existente ? existente.cantidad : 0);
 
-                        if(data.stock < cant){
-                            this.mensajeError = `Stock insuficiente (${data.stock} disponibles)`;
-                            return;
-                        }
+                        if(data.stock < totalCant){ this.mensajeError = `Stock insuficiente. Disponible: ${data.stock}`; return; }
 
-                        if (existente) {
-                            existente.cantidad = cant;
-                        } else {
-                            this.carrito.push({ id: data.id, nombre: data.nombre, precio: data.precio, cantidad: this.cantidadInput });
-                        }
-                        this.idInput = '';
-                        this.cantidadInput = 1;
-                        document.getElementById('input-producto').focus();
-                    } else {
-                        this.mensajeError = 'Producto no encontrado';
-                    }
-                } catch (e) { console.error(e); }
+                        if (existente) { existente.cantidad = totalCant; } 
+                        else { this.carrito.push({ id: data.id, nombre: data.nombre, precio: data.precio, cantidad: cant }); }
+                        
+                        this.idInput = ''; this.cantidadInput = 1; document.getElementById('input-producto').focus();
+                    } else { this.mensajeError = 'Producto no encontrado'; }
+                } catch (e) { this.mensajeError = 'Error de conexión'; }
             },
 
-            eliminarItem(index) {
-                this.carrito.splice(index, 1);
+            eliminarItem(index) { this.carrito.splice(index, 1); },
+
+            async buscarClientes(query) {
+                this.clienteNombreDisplay = query; this.clienteId = null; this.esVip = false; // Resetear VIP
+                if (query.length < 2) { this.listaClientes = []; return; }
+                const res = await fetch(`/api/clientes/buscar/?q=${query}`);
+                this.listaClientes = await res.json();
+            },
+
+            seleccionarCliente(cliente) {
+                this.clienteId = cliente.id;
+                this.clienteNombreDisplay = cliente.text;
+                this.esVip = cliente.es_vip; // Aquí detectamos si es VIP desde el backend
+                this.listaClientes = [];
+                // Si es VIP, sugerir descuento (Opcional)
+                if(this.esVip) { this.porcentajeDescuento = 10; } else { this.porcentajeDescuento = 0; }
+            },
+
+            async guardarNuevoCliente() {
+                if(!this.nuevoCliente.nombres) { this.msgErrorModal = "Nombre obligatorio"; return; }
+                const res = await fetch('/api/clientes/crear/', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(this.nuevoCliente)
+                });
+                const data = await res.json();
+                if(data.status === 'ok') {
+                    this.seleccionarCliente(data.cliente);
+                    this.modalClienteOpen = false; this.nuevoCliente = { nombres: '', cedula_ruc: '', telefono: '', email: '' };
+                } else { this.msgErrorModal = "Error: " + data.mensaje; }
             },
 
             async procesarVenta() {
-                if (!confirm(`¿Cobrar C$ ${this.totalVenta.toFixed(2)}?`)) return;
-
+                if (!confirm(`¿Cobrar C$ ${this.totalFinal.toFixed(2)}?`)) return;
                 const res = await fetch('/api/guardar-venta/', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         items: this.carrito,
-                        total: this.totalVenta,
-                        id_cliente: this.clienteId // <--- Enviamos el cliente seleccionado
+                        total: this.totalFinal, // Enviamos el total YA DESCONTADO
+                        id_cliente: this.clienteId,
+                        descuento: this.montoDescuento // Enviamos cuánto se descontó para registro
                     })
                 });
                 const data = await res.json();
-
                 if (data.status === 'ok') {
-                    this.carrito = [];
-                    this.clienteId = null;
-                    this.clienteNombreDisplay = '';
-                    if(confirm('✅ Venta OK. ¿Imprimir Ticket?')) {
-                        window.open('/venta/ticket/' + data.id_venta + '/', '_blank');
-                    }
-                } else {
-                    alert('Error: ' + data.mensaje);
-                }
+                    this.carrito = []; this.clienteId = null; this.clienteNombreDisplay = ''; this.porcentajeDescuento = 0; this.esVip = false;
+                    if(confirm('✅ Venta OK. ¿Imprimir Ticket?')) { window.open('/venta/ticket/' + data.id_venta + '/', '_blank'); }
+                } else { alert('Error: ' + data.mensaje); }
             }
         }
     }

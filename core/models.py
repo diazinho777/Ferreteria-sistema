@@ -55,9 +55,20 @@ class Producto(models.Model):
     categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, db_column='id_categoria')
     precio_compra = models.DecimalField(max_digits=10, decimal_places=2)
     precio_venta = models.DecimalField(max_digits=10, decimal_places=2)
-    stock = models.IntegerField(default=0)
-    stock_minimo = models.IntegerField(default=5)
+    stock = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    stock_minimo = models.DecimalField(max_digits=10, decimal_places=2, default=5)
+    activo = models.BooleanField(default=True, verbose_name="¿Activo?")
     imagen = models.ImageField(upload_to='productos/', blank=True, null=True)
+    UNIDADES = (
+        ('unidad', 'Unidad (Pza)'),
+        ('metro', 'Metro (m)'),
+        ('litro', 'Litro (L)'),
+        ('galon', 'Galón (gal)'),
+        ('libra', 'Libra (lb)'),
+        ('kg', 'Kilogramo (kg)'),
+        ('caja', 'Caja/Paquete'),
+    )
+    unidad = models.CharField(max_length=20, choices=UNIDADES, default='unidad', verbose_name="Unidad de Medida")
 
     def __str__(self):
         return f"ID: {self.id_producto} - {self.nombre}"
@@ -96,7 +107,7 @@ class DetalleCompra(models.Model):
     id_detalle_compra = models.AutoField(primary_key=True)
     compra = models.ForeignKey(Compra, related_name='detalles', on_delete=models.CASCADE, db_column='id_compra')
     producto = models.ForeignKey(Producto, on_delete=models.PROTECT, db_column='id_producto')
-    cantidad = models.IntegerField()
+    cantidad = models.DecimalField(max_digits=10, decimal_places=2)
     costo_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     subtotal = models.DecimalField(max_digits=12, decimal_places=2)
 
@@ -114,6 +125,8 @@ class Venta(models.Model):
     # Relación con la tabla Cliente
     cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT, null=True, blank=True, db_column='id_cliente')
     
+    descuento = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    total = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     fecha_venta = models.DateTimeField(auto_now_add=True)
     total = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
@@ -124,7 +137,7 @@ class DetalleVenta(models.Model):
     id_detalle_venta = models.AutoField(primary_key=True)
     venta = models.ForeignKey(Venta, related_name='detalles', on_delete=models.CASCADE, db_column='id_venta')
     producto = models.ForeignKey(Producto, on_delete=models.PROTECT, db_column='id_producto')
-    cantidad = models.IntegerField()
+    cantidad = models.DecimalField(max_digits=10, decimal_places=2)
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     subtotal = models.DecimalField(max_digits=12, decimal_places=2)
 
@@ -134,3 +147,26 @@ class DetalleVenta(models.Model):
 
     class Meta:
         db_table = 'detalle_ventas'
+        
+class Movimiento(models.Model):
+    TIPOS = (
+        ('entrada', 'Entrada (Compra)'),
+        ('salida', 'Salida (Venta)'),
+        ('ajuste_pos', 'Ajuste (+)'), # Por ejemplo, si encontraron stock perdido
+        ('ajuste_neg', 'Ajuste (-)'), # Por ejemplo, si algo se rompió
+    )
+    
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(User, on_delete=models.PROTECT)
+    tipo = models.CharField(max_length=20, choices=TIPOS)
+    cantidad = models.DecimalField(max_digits=10, decimal_places=2)
+    fecha = models.DateTimeField(auto_now_add=True)
+    descripcion = models.CharField(max_length=255, blank=True) # Ej: "Venta #45"
+
+    def __str__(self):
+        return f"{self.tipo} - {self.producto.nombre} ({self.cantidad})"
+    
+    class Meta:
+        db_table = 'movimientos'  
+        verbose_name = 'Movimiento de Inventario'
+        verbose_name_plural = 'Movimientos de Inventario'

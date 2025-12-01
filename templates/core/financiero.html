@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto space-y-6">
+    
+    <div class="flex flex-col md:flex-row justify-between items-end gap-4 border-b pb-4 border-gray-200">
+        <div>
+            <h2 class="text-3xl font-extrabold text-gray-900 border-l-8 border-green-700 pl-4">
+                Reporte Financiero
+            </h2>
+            <p class="text-gray-500 mt-1 ml-6">Analiza el rendimiento de tu negocio</p>
+        </div>
+
+        <form method="get" class="flex gap-2 items-end bg-white p-3 rounded shadow-sm">
+            <div>
+                <label class="text-xs font-bold text-gray-500 uppercase">Desde</label>
+                <input type="date" name="fecha_inicio" value="{{ fecha_inicio }}" class="p-2 border rounded text-sm focus:border-green-600 focus:ring-1 focus:ring-green-600">
+            </div>
+            <div>
+                <label class="text-xs font-bold text-gray-500 uppercase">Hasta</label>
+                <input type="date" name="fecha_fin" value="{{ fecha_fin }}" class="p-2 border rounded text-sm focus:border-green-600 focus:ring-1 focus:ring-green-600">
+            </div>
+            <button type="submit" class="bg-gray-900 text-white px-4 py-2 rounded text-sm font-bold hover:bg-gray-800 transition">
+                FILTRAR
+            </button>
+        </form>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-600">
+            <div class="text-gray-500 font-bold text-xs uppercase">Ingresos por Ventas</div>
+            <div class="text-3xl font-black text-gray-800">C$ {{ total_ingresos|floatformat:2 }}</div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-orange-500">
+            <div class="text-gray-500 font-bold text-xs uppercase">Descuentos Dados</div>
+            <div class="text-3xl font-black text-orange-600">- C$ {{ total_descuentos|floatformat:2 }}</div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-green-600">
+            <div class="text-gray-500 font-bold text-xs uppercase">Ganancia Estimada</div>
+            <div class="text-3xl font-black text-green-700">C$ {{ ganancia_estimada|floatformat:2 }}</div>
+            <p class="text-[10px] text-gray-400 mt-1">* Venta menos Costo Actual</p>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
+        <div class="bg-gray-100 px-6 py-3 border-b border-gray-200 font-bold text-gray-700 uppercase text-sm">
+            Desglose de Ventas ({{ ventas.count }} registros)
+        </div>
+        <table class="w-full text-left text-sm">
+            <thead class="bg-gray-900 text-white">
+                <tr>
+                    <th class="p-3">Fecha</th>
+                    <th class="p-3">Ticket</th>
+                    <th class="p-3">Cliente</th>
+                    <th class="p-3 text-right">Descuento</th>
+                    <th class="p-3 text-right">Total Cobrado</th>
+                    <th class="p-3 text-center">Acción</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% for v in ventas %}
+                <tr class="hover:bg-gray-50">
+                    <td class="p-3 text-gray-600">{{ v.fecha_venta|date:"d/m/Y H:i" }}</td>
+                    <td class="p-3 font-bold">#{{ v.id_venta }}</td>
+                    <td class="p-3">{{ v.cliente.nombres|default:"Consumidor Final" }}</td>
+                    <td class="p-3 text-right text-orange-600 font-bold">
+                        {% if v.descuento > 0 %}- {{ v.descuento }}{% else %}-{% endif %}
+                    </td>
+                    <td class="p-3 text-right font-black text-gray-800">C$ {{ v.total }}</td>
+                    <td class="p-3 text-center">
+                        <a href="{% url 'ticket_venta' v.id_venta %}" target="_blank" class="text-blue-600 hover:underline text-xs">Ver Ticket</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="p-6 text-center text-gray-500">No hay ventas en este rango de fechas.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+{% endblock %}

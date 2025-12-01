@@ -8,7 +8,9 @@
         <a href="{% url 'lista_productos' %}" class="text-gray-500 hover:text-red-600 font-bold">✕ Cancelar</a>
     </div>
 
-    <form method="post" enctype="multipart/form-data" class="p-8">
+    <form method="post" enctype="multipart/form-data" class="p-8" 
+          x-data="{ unidad: '{{ form.unidad.value|default:'unidad' }}' }">
+        
         {% csrf_token %}
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -18,35 +20,54 @@
                 {{ form.nombre }}
             </div>
 
+            <div class="col-span-1 md:col-span-2">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Descripción</label>
+                {{ form.descripcion }}
+            </div>
+
             <div>
                 <label class="block text-gray-700 text-sm font-bold mb-2">Categoría</label>
                 {{ form.categoria }}
-                <p class="text-xs text-gray-500 mt-1">Si está vacía, crea una en el Admin.</p>
             </div>
 
             <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">Imagen (Opcional)</label>
-                {{ form.imagen }}
+                <label class="block text-gray-700 text-sm font-bold mb-2">Unidad de Medida</label>
+                <select name="unidad" x-model="unidad" class="w-full p-2 border border-gray-300 rounded focus:border-red-600 focus:outline-none">
+                    {% for value, label in form.fields.unidad.choices %}
+                        <option value="{{ value }}" {% if form.unidad.value == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
             </div>
 
             <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">Costo Compra</label>
+                <label class="block text-gray-700 text-sm font-bold mb-2">
+                    Costo Compra (por <span x-text="unidad" class="uppercase text-red-600"></span>)
+                </label>
                 {{ form.precio_compra }}
             </div>
 
             <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">Precio Venta</label>
+                <label class="block text-gray-700 text-sm font-bold mb-2">
+                    Precio Venta (por <span x-text="unidad" class="uppercase text-red-600"></span>)
+                </label>
                 {{ form.precio_venta }}
             </div>
 
             <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">Stock Inicial</label>
+                <label class="block text-gray-700 text-sm font-bold mb-2">
+                    Stock Inicial (<span x-text="unidad" class="capitalize"></span>s)
+                </label>
                 {{ form.stock }}
             </div>
 
             <div>
                 <label class="block text-gray-700 text-sm font-bold mb-2">Alerta Stock Mínimo</label>
                 {{ form.stock_minimo }}
+            </div>
+
+            <div class="col-span-1 md:col-span-2 border-t pt-4 mt-2">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Imagen del Producto</label>
+                {{ form.imagen }}
             </div>
         </div>
 

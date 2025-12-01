@@ -95,6 +95,13 @@
 
     <div class="linea"></div>
 
+    {% if venta.descuento > 0 %}
+    <div style="text-align: right; margin-top: 5px;">
+        Subtotal: C$ {{ venta.total|add:venta.descuento|floatformat:2 }} <br>
+        Descuento: - C$ {{ venta.descuento }}
+    </div>
+    {% endif %}
+
     <div class="total-container">
         TOTAL: C$ {{ venta.total }}
     </div>

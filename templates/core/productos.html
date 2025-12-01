@@ -8,9 +8,20 @@
             Inventario General
         </h2>
 
-        <div class="flex flex-col md:flex-row gap-2 w-full md:w-auto">
+        <div class="flex flex-col md:flex-row gap-2 w-full md:w-auto items-center">
             
-            {% if user.role == 'admin' %}
+            <div class="flex bg-gray-200 rounded-lg p-1 mr-4">
+                <a href="{% url 'lista_productos' %}" 
+                   class="px-4 py-2 rounded-md text-sm font-bold transition {% if not estado %}bg-white text-gray-800 shadow{% else %}text-gray-500 hover:text-gray-700{% endif %}">
+                   Activos
+                </a>
+                <a href="{% url 'lista_productos' %}?estado=inactivos" 
+                   class="px-4 py-2 rounded-md text-sm font-bold transition {% if estado == 'inactivos' %}bg-white text-red-600 shadow{% else %}text-gray-500 hover:text-gray-700{% endif %}">
+                   Papelera
+                </a>
+            </div>
+
+            {% if user.role == 'admin' and not estado %}
             <a href="{% url 'agregar_producto' %}" class="bg-red-700 hover:bg-red-800 text-white px-4 py-3 rounded-md font-bold flex justify-center items-center gap-2 shadow-md transition whitespace-nowrap">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
                 Nuevo Producto
@@ -18,10 +29,12 @@
             {% endif %}
             
             <form method="get" action="" class="w-full flex">
+                {% if estado %}<input type="hidden" name="estado" value="{{ estado }}">{% endif %}
+                
                 <input type="text" 
                        name="q" 
                        value="{{ busqueda|default:'' }}"
-                       placeholder="Buscar por nombre o ID..." 
+                       placeholder="Buscar..." 
                        class="w-full p-3 border-2 border-gray-300 rounded-l-md focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600">
                 <button type="submit" class="bg-gray-900 text-white px-6 font-bold rounded-r-md hover:bg-gray-800 transition">
                     BUSCAR
@@ -51,7 +64,7 @@
             
             <tbody class="divide-y divide-gray-100">
                 {% for p in productos %}
-                <tr class="hover:bg-gray-50 transition {% if p.stock <= p.stock_minimo %}bg-red-50{% endif %}">
+                <tr class="hover:bg-gray-50 transition {% if p.stock <= p.stock_minimo and p.activo %}bg-red-50{% endif %} {% if not p.activo %}bg-gray-100 opacity-75{% endif %}">
                     
                     <td class="p-4">
                         {% if p.imagen %}
@@ -64,18 +77,28 @@
                     </td>
 
                     <td class="p-4 font-mono text-gray-600 font-bold">#{{ p.id_producto }}</td>
-                    <td class="p-4 font-medium text-gray-900">{{ p.nombre }}</td>
+                    
+                    <td class="p-4">
+                        <div class="font-medium text-gray-900">{{ p.nombre }}</div>
+                        {% if p.descripcion %}
+                            <div class="text-xs text-gray-500 mt-1 truncate w-32" title="{{ p.descripcion }}">{{ p.descripcion }}</div>
+                        {% endif %}
+                    </td>
+
                     <td class="p-4 text-gray-500 text-sm">{{ p.categoria.nombre|default:"Sin Categ." }}</td>
                     <td class="p-4 text-right font-bold text-gray-800">C$ {{ p.precio_venta }}</td>
                     
                     <td class="p-4 text-center">
                         <span class="font-bold text-lg {% if p.stock <= p.stock_minimo %}text-red-600{% else %}text-green-600{% endif %}">
-                            {{ p.stock }}
+                            {{ p.stock }} 
+                            <span class="text-xs text-gray-500 font-normal ml-1 block uppercase">{{ p.get_unidad_display }}</span>
                         </span>
                     </td>
                     
                     <td class="p-4 text-center">
-                        {% if p.stock == 0 %}
+                        {% if not p.activo %}
+                            <span class="bg-gray-200 text-gray-600 text-xs px-2 py-1 rounded-full font-bold uppercase">INACTIVO</span>
+                        {% elif p.stock == 0 %}
                             <span class="bg-red-200 text-red-800 text-xs px-2 py-1 rounded-full font-bold uppercase">AGOTADO</span>
                         {% elif p.stock <= p.stock_minimo %}
                             <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full font-bold uppercase">BAJO STOCK</span>
@@ -85,13 +108,33 @@
                     </td>
 
                     {% if user.role == 'admin' %}
-                    <td class="p-4 text-center">
-                        <a href="{% url 'editar_producto' p.id_producto %}" class="text-blue-600 hover:text-blue-900 font-bold text-sm underline flex justify-center items-center gap-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                            </svg>
-                            Editar
-                        </a>
+                    <td class="p-4 text-center flex justify-center items-center gap-3">
+                        
+                        {% if p.activo %}
+                            <a href="{% url 'historial_producto' p.id_producto %}" class="text-gray-600 hover:text-black text-lg" title="Ver Historial">📜</a>
+
+                            <a href="{% url 'editar_producto' p.id_producto %}" class="text-blue-600 hover:text-blue-900 font-bold text-sm underline flex items-center gap-1" title="Editar Producto">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                                </svg>
+                                Editar
+                            </a>
+
+                            <a href="{% url 'reportar_perdida' p.id_producto %}" class="text-red-400 hover:text-red-700 transition" title="Reportar Daño/Pérdida">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            </a>
+
+                            <a href="{% url 'eliminar_producto' p.id_producto %}" class="text-gray-400 hover:text-red-600 transition ml-2" title="Desactivar Producto">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </a>
+
+                        {% else %}
+                            <a href="{% url 'activar_producto' p.id_producto %}" class="bg-green-100 text-green-700 hover:bg-green-200 px-3 py-1 rounded-md text-xs font-bold flex items-center gap-1 transition shadow-sm" title="Reactivar Producto">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                RESTAURAR
+                            </a>
+                        {% endif %}
+
                     </td>
                     {% endif %}
                 </tr>
