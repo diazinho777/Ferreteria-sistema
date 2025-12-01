@@ -105,8 +105,8 @@ def ticket_venta(request, id_venta):
         'venta': venta,
         'detalles': detalles,
         'empresa': {
-            'nombre': 'FERRETERÍA REDENTOR',
-            'direccion': 'Calle Principal #123, Managua',
+            'nombre': 'FERRETERÍA MI REDENTOR',
+            'direccion': 'Ciudad Sandino, Managua',
             'telefono': '2222-5555',
             'ruc': 'J031000000000'
         }
@@ -121,25 +121,38 @@ def ticket_venta(request, id_venta):
 @login_required
 def lista_productos(request):
     busqueda = request.GET.get('q')
-    estado = request.GET.get('estado') # <--- NUEVO: Capturamos el filtro
+    estado = request.GET.get('estado')
+    categoria_id = request.GET.get('categoria') # <--- NUEVO: Filtro
     
-    # Por defecto mostramos activos, si piden 'inactivos', mostramos los falsos
+    # 1. Filtro de Estado (Activo/Papelera)
     if estado == 'inactivos':
-        productos = Producto.objects.filter(activo=False).order_by('nombre')
+        productos = Producto.objects.filter(activo=False)
     else:
-        productos = Producto.objects.filter(activo=True).order_by('nombre')
+        productos = Producto.objects.filter(activo=True)
 
+    # 2. Filtro por Categoría (NUEVO)
+    if categoria_id:
+        productos = productos.filter(categoria_id=categoria_id)
+
+    # 3. Buscador
     if busqueda:
-        # Buscamos en TODOS (activos e inactivos) si hay búsqueda, o mantenemos el filtro
         productos = productos.filter(
             Q(nombre__icontains=busqueda) | 
             Q(id_producto__icontains=busqueda)
         )
+    
+    # 4. ORDENAMIENTO POR ID (NUEVO)
+    productos = productos.order_by('id_producto')
+
+    # Obtenemos todas las categorías para el dropdown
+    categorias = Categoria.objects.all().order_by('nombre')
 
     context = {
         'productos': productos,
         'busqueda': busqueda,
-        'estado': estado # Pasamos el estado para saber qué botón pintar en el HTML
+        'estado': estado,
+        'categorias': categorias,       # Enviamos la lista
+        'categoria_seleccionada': int(categoria_id) if categoria_id else None
     }
     return render(request, 'core/productos.html', context)
 

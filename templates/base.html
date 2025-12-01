@@ -136,14 +136,13 @@
         <header class="flex justify-between items-center py-4 px-8 bg-red-900 shadow-md border-b border-red-800 h-16">
             
             <h2 class="text-xl font-bold text-white tracking-wide">
-                {% if 'venta' in request.path %} Punto de Venta
-                {% elif 'inventario' in request.path %} Inventario
+                {% if 'inventario' in request.path %} Inventario  {% elif 'venta' in request.path %} Punto de Venta
+                {% elif 'compras' in request.path %} Entrada de Stock
                 {% elif 'finanzas' in request.path %} Reportes Financieros
                 {% elif 'clientes' in request.path %} Gestión de Clientes
                 {% elif 'proveedores' in request.path %} Gestión de Proveedores
                 {% elif 'usuarios' in request.path %} Equipo de Trabajo
                 {% elif 'categorias' in request.path %} Categorías
-                {% elif 'compras' in request.path %} Compras (Entradas)
                 {% else %} Panel de Control {% endif %}
             </h2>
 
